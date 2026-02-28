@@ -1,7 +1,6 @@
-Flask==3.0.3
-kerykeion==4.16.1
-geopy==2.4.1
-pytz==2024.1
-reportlab==4.2.2
-gunicorn==22.0.0
-Werkzeug==3.0.3
+Flask>=2.3.0
+kerykeion>=4.13.0
+geopy>=2.3.0
+pytz>=2023.3
+reportlab>=4.0.0
+gunicorn>=21.0.0
