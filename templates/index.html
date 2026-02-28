@@ -21,17 +21,20 @@
     <span>♐</span><span>♑</span><span>♒</span><span>♓</span>
   </div>
 
-  <div class="page-wrapper">
+  <!-- ══════════════════════════════════════
+       SECTION 1 — Hero / Landing Screen
+  ══════════════════════════════════════ -->
+  <section class="hero-screen" id="heroScreen">
+    <div class="hero-inner">
 
-    <!-- ── Header ── -->
-    <header class="site-header">
-      <div class="logo-mark">✦</div>
-      <h1 class="logo-text">CELESTIA</h1>
-      <p class="logo-tagline">Your Premium Astrological Companion</p>
-    </header>
+      <!-- Logo -->
+      <div class="site-header">
+        <div class="logo-mark">✦</div>
+        <h1 class="logo-text">CELESTIA</h1>
+        <p class="logo-tagline">Your Premium Astrological Companion</p>
+      </div>
 
-    <!-- ── Hero ── -->
-    <section class="hero">
+      <!-- Orbit animation -->
       <div class="hero-orbit" aria-hidden="true">
         <div class="orbit-ring ring-1"></div>
         <div class="orbit-ring ring-2"></div>
@@ -40,6 +43,8 @@
         <div class="orbit-planet p2">🌙</div>
         <div class="orbit-planet p3">♀</div>
       </div>
+
+      <!-- Hero text -->
       <div class="hero-content">
         <p class="hero-label">✦ NATAL CHART READING ✦</p>
         <h2 class="hero-title">Unlock the Secrets<br/><span class="gold-text">Written in the Stars</span></h2>
@@ -49,10 +54,37 @@
           that has been yours since the moment of your birth.
         </p>
       </div>
-    </section>
 
-    <!-- ── Form Card ── -->
-    <section class="form-section">
+      <!-- CTA Button -->
+      <button class="enter-btn" id="enterBtn" onclick="showForm()">
+        <span class="enter-btn-text">Enter the Details</span>
+        <span class="enter-btn-arrow">↓</span>
+        <div class="enter-btn-glow"></div>
+      </button>
+
+      <!-- Features strip -->
+      <div class="hero-features">
+        <div class="hf-item"><span>☀</span> Sun · Moon · Rising</div>
+        <div class="hf-dot">·</div>
+        <div class="hf-item"><span>♄</span> Full Planetary Chart</div>
+        <div class="hf-dot">·</div>
+        <div class="hf-item"><span>✦</span> Deep Interpretations</div>
+        <div class="hf-dot">·</div>
+        <div class="hf-item"><span>⬇</span> PDF &amp; Text Export</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 2 — Form Screen
+  ══════════════════════════════════════ -->
+  <section class="form-screen" id="formScreen">
+    <div class="form-screen-inner">
+
+      <!-- Back link -->
+      <button class="back-to-hero" onclick="showHero()">← Back</button>
+
       <div class="form-card glass-card">
         <div class="form-card-header">
           <span class="form-icon">✧</span>
@@ -87,7 +119,7 @@
             <span class="field-hint">As it appears on your birth certificate</span>
           </div>
 
-          <!-- Date of Birth -->
+          <!-- Date of Birth + Birth Time -->
           <div class="field-row">
             <div class="field-group">
               <label for="dob">
@@ -102,7 +134,6 @@
               />
             </div>
 
-            <!-- Birth Time -->
             <div class="field-group">
               <label for="birth_time">
                 <span class="field-icon">🌙</span> Birth Time
@@ -153,40 +184,51 @@
         </div>
 
       </div>
-    </section>
 
-    <!-- ── Features ── -->
-    <section class="features">
-      <div class="feature-item">
-        <div class="feature-icon">☀</div>
-        <h4>Sun, Moon & Rising</h4>
-        <p>Your Big Three — the core pillars of your astrological identity</p>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">♄</div>
-        <h4>Full Planetary Chart</h4>
-        <p>All 10 planets plus Chiron, North Node, and house placements</p>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">✦</div>
-        <h4>Deep Interpretations</h4>
-        <p>Rich, personalized insights for love, career, and life path</p>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">⬇</div>
-        <h4>Export Your Reading</h4>
-        <p>Save as PDF or plain text to keep your cosmic story forever</p>
-      </div>
-    </section>
+      <!-- Footer -->
+      <footer class="site-footer">
+        <p class="footer-mark">✦ CELESTIA ✦</p>
+        <p class="footer-note">Powered by Swiss Ephemeris &bull; No data stored &bull; Your privacy respected</p>
+      </footer>
 
-    <!-- ── Footer ── -->
-    <footer class="site-footer">
-      <p class="footer-mark">✦ CELESTIA ✦</p>
-      <p class="footer-note">Powered by Swiss Ephemeris &bull; No data stored &bull; Your privacy respected</p>
-    </footer>
-
-  </div>
+    </div>
+  </section>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    // Show form if there were errors (came back from server)
+    {% if errors %}
+    document.addEventListener('DOMContentLoaded', () => showForm(false));
+    {% endif %}
+
+    function showForm(animate = true) {
+      const hero = document.getElementById('heroScreen');
+      const form = document.getElementById('formScreen');
+      if (animate) {
+        hero.classList.add('slide-out-up');
+        setTimeout(() => {
+          hero.classList.add('hidden-screen');
+          form.classList.remove('hidden-screen');
+          form.classList.add('slide-in-up');
+        }, 380);
+      } else {
+        hero.classList.add('hidden-screen');
+        form.classList.remove('hidden-screen');
+      }
+    }
+
+    function showHero() {
+      const hero = document.getElementById('heroScreen');
+      const form = document.getElementById('formScreen');
+      form.classList.add('slide-out-down');
+      setTimeout(() => {
+        form.classList.add('hidden-screen');
+        form.classList.remove('slide-out-down', 'slide-in-up');
+        hero.classList.remove('hidden-screen', 'slide-out-up');
+        hero.classList.add('slide-in-down');
+        setTimeout(() => hero.classList.remove('slide-in-down'), 400);
+      }, 380);
+    }
+  </script>
 </body>
 </html>
