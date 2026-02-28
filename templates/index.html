@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestia — Discover Your Cosmic Blueprint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="index-page">
+
+  <!-- Starfield canvas -->
+  <canvas id="starfield"></canvas>
+
+  <!-- Floating zodiac glyphs -->
+  <div class="zodiac-bg" aria-hidden="true">
+    <span>♈</span><span>♉</span><span>♊</span><span>♋</span>
+    <span>♌</span><span>♍</span><span>♎</span><span>♏</span>
+    <span>♐</span><span>♑</span><span>♒</span><span>♓</span>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- ── Header ── -->
+    <header class="site-header">
+      <div class="logo-mark">✦</div>
+      <h1 class="logo-text">CELESTIA</h1>
+      <p class="logo-tagline">Your Premium Astrological Companion</p>
+    </header>
+
+    <!-- ── Hero ── -->
+    <section class="hero">
+      <div class="hero-orbit" aria-hidden="true">
+        <div class="orbit-ring ring-1"></div>
+        <div class="orbit-ring ring-2"></div>
+        <div class="orbit-ring ring-3"></div>
+        <div class="orbit-planet p1">☀</div>
+        <div class="orbit-planet p2">🌙</div>
+        <div class="orbit-planet p3">♀</div>
+      </div>
+      <div class="hero-content">
+        <p class="hero-label">✦ NATAL CHART READING ✦</p>
+        <h2 class="hero-title">Unlock the Secrets<br/><span class="gold-text">Written in the Stars</span></h2>
+        <p class="hero-desc">
+          Discover your cosmic blueprint through the ancient wisdom of astrology.
+          Your Sun, Moon, Rising and planetary positions reveal a deeply personal story
+          that has been yours since the moment of your birth.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Form Card ── -->
+    <section class="form-section">
+      <div class="form-card glass-card">
+        <div class="form-card-header">
+          <span class="form-icon">✧</span>
+          <h3>Begin Your Reading</h3>
+          <p>Enter your birth details below — the more precise, the deeper the insight.</p>
+        </div>
+
+        {% if errors %}
+        <div class="error-banner">
+          {% for err in errors %}
+          <p>⚠ {{ err }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <form action="/reading" method="POST" id="birthForm" novalidate>
+
+          <!-- Full Name -->
+          <div class="field-group">
+            <label for="name">
+              <span class="field-icon">✦</span> Full Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="e.g. Amelia Carter"
+              value="{{ form_data.get('name', '') if form_data else '' }}"
+              required
+              autocomplete="name"
+            />
+            <span class="field-hint">As it appears on your birth certificate</span>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="field-row">
+            <div class="field-group">
+              <label for="dob">
+                <span class="field-icon">☀</span> Date of Birth
+              </label>
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                value="{{ form_data.get('dob', '') if form_data else '' }}"
+                required
+              />
+            </div>
+
+            <!-- Birth Time -->
+            <div class="field-group">
+              <label for="birth_time">
+                <span class="field-icon">🌙</span> Birth Time
+              </label>
+              <input
+                type="time"
+                id="birth_time"
+                name="birth_time"
+                value="{{ form_data.get('birth_time', '') if form_data else '' }}"
+                required
+              />
+              <span class="field-hint">Local time at birth location</span>
+            </div>
+          </div>
+
+          <!-- Birth Place -->
+          <div class="field-group">
+            <label for="birth_place">
+              <span class="field-icon">✦</span> Birth Place
+            </label>
+            <input
+              type="text"
+              id="birth_place"
+              name="birth_place"
+              placeholder="e.g. Paris, France or New York, USA"
+              value="{{ form_data.get('birth_place', '') if form_data else '' }}"
+              required
+              autocomplete="off"
+            />
+            <span class="field-hint">City and country for accurate rising sign</span>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text">Reveal My Cosmic Blueprint</span>
+            <span class="btn-icon">→</span>
+            <div class="btn-shimmer"></div>
+          </button>
+
+        </form>
+
+        <!-- Loading overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+          <div class="loading-content">
+            <div class="loading-orb"></div>
+            <p class="loading-text">Consulting the cosmos…</p>
+            <p class="loading-sub">Calculating your planetary positions</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Features ── -->
+    <section class="features">
+      <div class="feature-item">
+        <div class="feature-icon">☀</div>
+        <h4>Sun, Moon & Rising</h4>
+        <p>Your Big Three — the core pillars of your astrological identity</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">♄</div>
+        <h4>Full Planetary Chart</h4>
+        <p>All 10 planets plus Chiron, North Node, and house placements</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">✦</div>
+        <h4>Deep Interpretations</h4>
+        <p>Rich, personalized insights for love, career, and life path</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⬇</div>
+        <h4>Export Your Reading</h4>
+        <p>Save as PDF or plain text to keep your cosmic story forever</p>
+      </div>
+    </section>
+
+    <!-- ── Footer ── -->
+    <footer class="site-footer">
+      <p class="footer-mark">✦ CELESTIA ✦</p>
+      <p class="footer-note">Powered by Swiss Ephemeris &bull; No data stored &bull; Your privacy respected</p>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

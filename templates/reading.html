@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ name }}'s Cosmic Reading — Celestia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="reading-page">
+
+  <canvas id="starfield"></canvas>
+
+  <!-- Floating glyphs -->
+  <div class="zodiac-bg" aria-hidden="true">
+    <span>♈</span><span>♉</span><span>♊</span><span>♋</span>
+    <span>♌</span><span>♍</span><span>♎</span><span>♏</span>
+    <span>♐</span><span>♑</span><span>♒</span><span>♓</span>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- ── Nav ── -->
+    <nav class="reading-nav">
+      <a href="/" class="back-link">← New Reading</a>
+      <div class="logo-mark-sm">✦ CELESTIA ✦</div>
+      <div class="action-btns">
+        <button class="action-btn copy-btn" id="copyBtn" title="Copy reading to clipboard">
+          <span>⎘</span> Copy
+        </button>
+        <button class="action-btn export-btn" id="exportTxtBtn" title="Export as text">
+          <span>↓</span> Text
+        </button>
+        <button class="action-btn export-btn pdf-btn" id="exportPdfBtn" title="Export as PDF">
+          <span>↓</span> PDF
+        </button>
+      </div>
+    </nav>
+
+    <!-- ── Hero Banner ── -->
+    <header class="reading-hero" style="--sign-color: {{ sun_color }};">
+      <div class="reading-hero-bg" aria-hidden="true"></div>
+      <div class="reading-hero-content">
+        <p class="reading-label">✦ NATAL CHART READING ✦</p>
+        <h1 class="reading-name">{{ name }}</h1>
+        <p class="reading-meta">
+          {{ dob }} &bull; {{ birth_time }} &bull; {{ birth_place }}
+        </p>
+        {% if location_resolved %}
+        <p class="reading-location">📍 {{ location_resolved }}</p>
+        {% endif %}
+      </div>
+    </header>
+
+    <!-- ── Big Three ── -->
+    <section class="big-three-section reveal-section">
+      <div class="section-label">✦ THE BIG THREE ✦</div>
+      <div class="big-three-grid">
+
+        <div class="big-three-card sun-card glass-card" data-sign="{{ sun_sign }}">
+          <div class="btc-glyph">{{ sun_symbol }}</div>
+          <div class="btc-label">SUN SIGN</div>
+          <div class="btc-sign">{{ sun_sign }}</div>
+          <div class="btc-keyword">{{ sun_keyword }}</div>
+          <div class="btc-dates">{{ sun_dates }}</div>
+          <div class="btc-details">
+            <span class="btc-badge element-badge">{{ sun_element }}</span>
+            <span class="btc-badge modality-badge">{{ sun_modality }}</span>
+            <span class="btc-badge ruler-badge">♃ {{ sun_ruler }}</span>
+          </div>
+        </div>
+
+        <div class="big-three-card moon-card glass-card">
+          <div class="btc-glyph">🌙</div>
+          <div class="btc-label">MOON SIGN</div>
+          <div class="btc-sign">{{ moon_sign }}</div>
+          <div class="btc-keyword">Inner Emotional World</div>
+          <div class="btc-dates">Instincts & Feelings</div>
+          <div class="btc-details">
+            <span class="btc-badge moon-badge">Emotional Core</span>
+          </div>
+        </div>
+
+        <div class="big-three-card rising-card glass-card">
+          <div class="btc-glyph">↑</div>
+          <div class="btc-label">RISING SIGN</div>
+          <div class="btc-sign">{{ rising_sign }}</div>
+          <div class="btc-keyword">The Outer Mask</div>
+          <div class="btc-dates">First Impressions</div>
+          <div class="btc-details">
+            <span class="btc-badge rising-badge">Ascendant</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="big-three-summary glass-card">
+        <p>{{ big_three_summary }}</p>
+      </div>
+    </section>
+
+    <!-- ── Traits ── -->
+    {% if sun_traits %}
+    <section class="traits-section reveal-section">
+      <div class="section-label">✦ {{ sun_sign | upper }} TRAITS ✦</div>
+      <div class="traits-row">
+        {% for trait in sun_traits %}
+        <div class="trait-chip">{{ trait }}</div>
+        {% endfor %}
+        <div class="trait-chip stone-chip">💎 {{ sun_stone }}</div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ── Main Reading ── -->
+    <section class="reading-grid reveal-section">
+
+      <!-- Personality -->
+      <div class="reading-card glass-card">
+        <div class="rc-icon">☀</div>
+        <h3 class="rc-title">Personality &amp; Strengths</h3>
+        <p class="rc-text">{{ sun_strengths }}</p>
+      </div>
+
+      <!-- Challenges -->
+      <div class="reading-card glass-card">
+        <div class="rc-icon">⚡</div>
+        <h3 class="rc-title">Growth &amp; Challenges</h3>
+        <p class="rc-text">{{ sun_challenges }}</p>
+      </div>
+
+      <!-- Emotional World -->
+      <div class="reading-card glass-card">
+        <div class="rc-icon">🌙</div>
+        <h3 class="rc-title">Your Emotional World</h3>
+        <p class="rc-text">{{ moon_interpretation }}</p>
+      </div>
+
+      <!-- Outer Presence -->
+      <div class="reading-card glass-card">
+        <div class="rc-icon">↑</div>
+        <h3 class="rc-title">Your Outer Presence</h3>
+        <p class="rc-text">{{ rising_interpretation }}</p>
+      </div>
+
+      <!-- Love -->
+      <div class="reading-card glass-card love-card">
+        <div class="rc-icon">♀</div>
+        <h3 class="rc-title">Love &amp; Relationships</h3>
+        <p class="rc-text">{{ sun_love }}</p>
+      </div>
+
+      <!-- Career -->
+      <div class="reading-card glass-card career-card">
+        <div class="rc-icon">♄</div>
+        <h3 class="rc-title">Career &amp; Vocation</h3>
+        <p class="rc-text">{{ sun_career }}</p>
+      </div>
+
+    </section>
+
+    <!-- ── Inner Planets ── -->
+    {% if mercury_reading or venus_reading or mars_reading %}
+    <section class="inner-planets reveal-section">
+      <div class="section-label">✦ INNER PLANETS ✦</div>
+      <div class="planet-cards-grid">
+
+        {% if mercury_reading %}
+        <div class="planet-detail-card glass-card">
+          <div class="pdc-header">
+            <span class="pdc-symbol">☿</span>
+            <div>
+              <div class="pdc-name">Mercury in {{ mercury_sign }}</div>
+              <div class="pdc-sub">Mind &amp; Communication</div>
+            </div>
+          </div>
+          <p>{{ mercury_reading }}</p>
+        </div>
+        {% endif %}
+
+        {% if venus_reading %}
+        <div class="planet-detail-card glass-card">
+          <div class="pdc-header">
+            <span class="pdc-symbol">♀</span>
+            <div>
+              <div class="pdc-name">Venus in {{ venus_sign }}</div>
+              <div class="pdc-sub">Love &amp; Beauty</div>
+            </div>
+          </div>
+          <p>{{ venus_reading }}</p>
+        </div>
+        {% endif %}
+
+        {% if mars_reading %}
+        <div class="planet-detail-card glass-card">
+          <div class="pdc-header">
+            <span class="pdc-symbol">♂</span>
+            <div>
+              <div class="pdc-name">Mars in {{ mars_sign }}</div>
+              <div class="pdc-sub">Drive &amp; Action</div>
+            </div>
+          </div>
+          <p>{{ mars_reading }}</p>
+        </div>
+        {% endif %}
+
+        {% if jupiter_text %}
+        <div class="planet-detail-card glass-card">
+          <div class="pdc-header">
+            <span class="pdc-symbol">♃</span>
+            <div>
+              <div class="pdc-name">Jupiter in {{ jupiter_sign }}</div>
+              <div class="pdc-sub">Luck &amp; Expansion</div>
+            </div>
+          </div>
+          <p>{{ jupiter_text }}</p>
+        </div>
+        {% endif %}
+
+        {% if saturn_text %}
+        <div class="planet-detail-card glass-card">
+          <div class="pdc-header">
+            <span class="pdc-symbol">♄</span>
+            <div>
+              <div class="pdc-name">Saturn in {{ saturn_sign }}</div>
+              <div class="pdc-sub">Lessons &amp; Mastery</div>
+            </div>
+          </div>
+          <p>{{ saturn_text }}</p>
+        </div>
+        {% endif %}
+
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ── Element & Modality ── -->
+    <section class="element-section reveal-section">
+      <div class="section-label">✦ COSMIC BLUEPRINT ✦</div>
+      <div class="element-grid">
+
+        <div class="element-card glass-card">
+          <div class="ec-label">DOMINANT ELEMENT</div>
+          <div class="ec-value element-{{ dominant_element | lower }}">{{ dominant_element }}</div>
+          <p class="ec-desc">{{ dominant_element_desc }}</p>
+        </div>
+
+        <div class="element-card glass-card">
+          <div class="ec-label">DOMINANT MODALITY</div>
+          <div class="ec-value">{{ dominant_modality }}</div>
+          <p class="ec-desc">{{ dominant_modality_desc }}</p>
+        </div>
+
+        <div class="element-card glass-card element-balance-card">
+          <div class="ec-label">ELEMENT BALANCE</div>
+          <div class="element-bars">
+            {% for el, count in element_balance.items() %}
+            <div class="el-bar-row">
+              <span class="el-name">{{ el }}</span>
+              <div class="el-bar-track">
+                <div class="el-bar el-{{ el | lower }}" style="width: {{ (count / 12 * 100)|int }}%"></div>
+              </div>
+              <span class="el-count">{{ count }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Life Path ── -->
+    <section class="life-path-section reveal-section">
+      <div class="life-path-card glass-card">
+        <div class="lp-icon">✦</div>
+        <h3>Your Life Path</h3>
+        <p>{{ life_path }}</p>
+        {% if retrograde_text %}
+        <p class="retrograde-note">{{ retrograde_text }}</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- ── Full Planet Table ── -->
+    {% if planets %}
+    <section class="planets-section reveal-section">
+      <div class="section-label">✦ PLANETARY POSITIONS ✦</div>
+      <div class="planet-table-wrap glass-card">
+        <table class="planet-table">
+          <thead>
+            <tr>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>Element</th>
+              <th>House</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for planet_name, pdata in planets.items() %}
+            <tr class="{% if pdata.retrograde %}retro-row{% endif %}">
+              <td class="planet-name-cell">
+                <span class="planet-emoji">{{ pdata.emoji }}</span>
+                {{ planet_name }}
+                {% if pdata.retrograde %}<span class="retro-badge">℞</span>{% endif %}
+              </td>
+              <td>
+                <span class="sign-cell">{{ pdata.sign }}</span>
+              </td>
+              <td class="degree-cell">{{ pdata.degree }}°</td>
+              <td>
+                <span class="element-tag el-tag-{{ pdata.element | lower }}">{{ pdata.element }}</span>
+              </td>
+              <td class="house-cell">{{ pdata.house }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ── Houses Table ── -->
+    {% if houses %}
+    <section class="houses-section reveal-section">
+      <div class="section-label">✦ HOUSE POSITIONS ✦</div>
+      <div class="houses-grid">
+        {% for house_num, hdata in houses.items() %}
+        <div class="house-card glass-card">
+          <div class="hc-num">{{ house_num }}</div>
+          <div class="hc-emoji">{{ hdata.emoji }}</div>
+          <div class="hc-sign">{{ hdata.sign }}</div>
+          <div class="hc-degree">{{ hdata.degree }}°</div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- ── Export Bar ── -->
+    <section class="export-section reveal-section">
+      <div class="export-card glass-card">
+        <div class="export-icon">✦</div>
+        <h3>Keep Your Reading</h3>
+        <p>Save your cosmic blueprint to revisit whenever the stars call you to reflect.</p>
+        <div class="export-btns">
+          <button class="export-big-btn copy-big" id="copyBtnBottom">
+            <span>⎘</span> Copy to Clipboard
+          </button>
+          <button class="export-big-btn txt-big" id="exportTxtBtnBottom">
+            <span>↓</span> Download as Text
+          </button>
+          <button class="export-big-btn pdf-big" id="exportPdfBtnBottom">
+            <span>↓</span> Download as PDF
+          </button>
+        </div>
+        <div id="copyToast" class="copy-toast hidden">✓ Reading copied to clipboard!</div>
+      </div>
+    </section>
+
+    <!-- ── Footer ── -->
+    <footer class="site-footer">
+      <p class="footer-mark">✦ CELESTIA ✦</p>
+      <p class="footer-note">Powered by Swiss Ephemeris &bull; No data stored &bull; Your privacy respected</p>
+    </footer>
+
+  </div>
+
+  <!-- Reading data for JS export -->
+  <script id="readingData" type="application/json">
+  {
+    "name": {{ name | tojson }},
+    "dob": {{ dob | tojson }},
+    "birth_time": {{ birth_time | tojson }},
+    "birth_place": {{ birth_place | tojson }},
+    "sun_sign": {{ sun_sign | tojson }},
+    "moon_sign": {{ moon_sign | tojson }},
+    "rising_sign": {{ rising_sign | tojson }},
+    "sun_strengths": {{ sun_strengths | tojson }},
+    "sun_challenges": {{ sun_challenges | tojson }},
+    "sun_love": {{ sun_love | tojson }},
+    "sun_career": {{ sun_career | tojson }},
+    "moon_interpretation": {{ moon_interpretation | tojson }},
+    "rising_interpretation": {{ rising_interpretation | tojson }},
+    "life_path": {{ life_path | tojson }},
+    "mercury_reading": {{ mercury_reading | tojson }},
+    "venus_reading": {{ venus_reading | tojson }},
+    "mars_reading": {{ mars_reading | tojson }},
+    "jupiter_text": {{ jupiter_text | tojson }},
+    "saturn_text": {{ saturn_text | tojson }},
+    "retrograde_text": {{ retrograde_text | tojson }},
+    "planets": {{ planets | tojson }}
+  }
+  </script>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/reading.js') }}"></script>
+</body>
+</html>
